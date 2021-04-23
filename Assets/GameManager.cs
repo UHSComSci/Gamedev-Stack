@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     int height = 0;
     float l, r, f, b;
     public Transform block;
+    public Transform basePlatform;
 
     public Transform slidelr;
     public Transform slidefb;
@@ -20,12 +21,18 @@ public class GameManager : MonoBehaviour
     Transform cur;
     bool gameOver = false;
 
-    float hue;
-    public float hueIncrement = 0.03f;
+    public Color[] colorPalette;
+    public int colorPeriod = 8;
+
+    public GradientBackground gradient;
 
     // Start is called before the first frame update
     void Start()
     {
+        MeshRenderer gameObjectRenderer = basePlatform.GetComponent<MeshRenderer>();
+        Material newMaterial = new Material(Shader.Find("Standard"));
+        newMaterial.color = getColor(height);
+        gameObjectRenderer.material = newMaterial;
         NextBlock();
     }
 
@@ -36,8 +43,7 @@ public class GameManager : MonoBehaviour
 
         float difficulty = Mathf.Pow(0.005f * height, 2) + 1;
 
-        //Background Color
-        camera.backgroundColor = Color.Lerp(camera.backgroundColor, Color.HSVToRGB((hue+0.8f)%1, 0.5f, 0.5f), 0.05f);
+
         //Camera Movement
         Vector3 c = camera.transform.position;
         c.y = 7 + height * 0.1f;
@@ -115,7 +121,6 @@ public class GameManager : MonoBehaviour
         }
 
 
-
         //Spawn Block with width and length
         if (height % 2 == 0)
             cur = Instantiate(block, slidelr);
@@ -123,14 +128,7 @@ public class GameManager : MonoBehaviour
             cur = Instantiate(block, slidefb);
         cur.gameObject.GetComponent<BlockScript>().ChangeSize(l, r, f, b);
 
-        //New Color
-        hue = (hue+hueIncrement)%1;
-        MeshRenderer gameObjectRenderer = cur.GetComponent<MeshRenderer>();
-        Material newMaterial = new Material(Shader.Find("Standard"));
-        newMaterial.color = Color.HSVToRGB(hue, 0.75f, 1);
-        gameObjectRenderer.material = newMaterial;
 
-      
         //Reset Moving Platform Position
         Vector3 lr = slidelr.position;
         lr.x = moveRange;
@@ -141,6 +139,23 @@ public class GameManager : MonoBehaviour
         slidefb.position = fb;
 
         height++;
+
+        //Colors
+        MeshRenderer gameObjectRenderer = cur.GetComponent<MeshRenderer>();
+        Material newMaterial = new Material(Shader.Find("Standard"));
+        newMaterial.color = getColor(height);
+        gameObjectRenderer.material = newMaterial;
+
+        gradient.SetColor(getColor(height),getColor(height - colorPeriod * 2));
+    }
+
+    private Color getColor(int progress)
+    {
+        if (progress < colorPeriod) progress += colorPeriod * colorPalette.Length;
+        float colorT = (progress % colorPeriod) / (float)colorPeriod;
+        int curIdx = (progress / colorPeriod) % colorPalette.Length;
+        int nextIdx = (curIdx + 1) % colorPalette.Length;
+        return Color.Lerp(colorPalette[curIdx], colorPalette[nextIdx], colorT);
     }
 
     public void GameOver()
