@@ -11,7 +11,7 @@ public class GradientBackground : MonoBehaviour
     Color cur1, cur2;
     bool init = true;
 
-    float colorChangeSpeed = 0.1f;
+    float colorChangeSpeed = 0.02f;
 
 
     void Awake()
@@ -19,7 +19,6 @@ public class GradientBackground : MonoBehaviour
         backgroundTexture = new Texture2D(1, 2);
         backgroundTexture.wrapMode = TextureWrapMode.Clamp;
         backgroundTexture.filterMode = FilterMode.Bilinear;
-        SetColor(Color.black, Color.white);
     }
 
     private void Update()

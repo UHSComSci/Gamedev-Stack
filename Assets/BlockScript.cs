@@ -16,7 +16,7 @@ public class BlockScript : MonoBehaviour
         
     }
 
-    public void ChangeSize(float l, float r, float f, float b)
+    public void ChangeSize(float l, float r, float f, float b, float layerHeight)
     {
         this.l = l;
         this.r = r;
@@ -28,7 +28,7 @@ public class BlockScript : MonoBehaviour
         if (width <= 0 || length <= 0)
             FindObjectOfType<GameManager>().GameOver();
 
-        transform.localScale = new Vector3(width, 0.1f, length);
+        transform.localScale = new Vector3(width, layerHeight, length);
         transform.localPosition = new Vector3((l - r) / 2f, 0, (b - f) / 2f);
     }
 }
